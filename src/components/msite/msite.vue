@@ -3,7 +3,7 @@
         <header>
             <div class="location"> 
                 <i class="material-icons">place</i>
-				<span class="locationName">{{ geoName.formatted_address }}</span>
+				<span class="locationName">{{ geoName }}</span>
             </div>
             <div class="searchBox">
                 <input type="search" name="searchBox" placeholder="搜索商家 商品"> </div>
@@ -46,10 +46,7 @@ export default {
                 latitude: '',
                 longitude: ''
             },
-            geoName: {
-            	'formatted_address': ''
-            },
-            ak: 'IY1EUbRdisrNv1gr79QBderTndkv0MaD',
+            geoName: '',
             themes: [],
             geohash: '',
             restaurants: [],
@@ -85,9 +82,10 @@ export default {
         },
         init(){
             let _this = this
-            let url = '/geocoder/v2/?location=' + this.GEO.latitude + ',' + this.GEO.longitude + '&output=json&pois=1&ak=' + this.ak
+            let url = `https://mainsite-restapi.ele.me/bgs/poi/reverse_geo_coding?latitude=${this.GEO.latitude}&longitude=${this.GEO.longitude}`
             axios.get(url).then(function(response) {
-            	_this.geoName = response.data.result
+                console.log(response.data.name)
+            	_this.geoName = response.data.name
             })
             this.hotsearch()
             this.getThemes()
@@ -95,7 +93,6 @@ export default {
             this.received = true
         },
         success(position) {
-            console.log(789)
             let lat = position.coords.latitude
             let lng = position.coords.longitude
             this.geohash = Geohash.encode(lat, lng) 
@@ -104,8 +101,8 @@ export default {
             this.init()
         },
         error() {
-             this.GEO.latitude = 39.98537
-             this.GEO.longitude = 116.316798
+             this.GEO.latitude = 31.9045433
+             this.GEO.longitude = 118.8986685
              this.geohash = Geohash.encode(this.GEO.latitude, this.GEO.longitude) 
              this.init()
              alert('获取地址失败，已显示默认地址')
@@ -137,7 +134,7 @@ export default {
         loadMore () {
             let differ = this.$el.offsetHeight - window.scrollY
             if (Math.abs(Math.floor(differ) - window.innerHeight) < 50) {
-                console.log('aha')
+                console.log('成功获取新的商家列表')
                 this.count++
                 this.getRestaurants()
             }
